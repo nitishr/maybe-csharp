@@ -1,0 +1,94 @@
+The aim of the Maybe type is to avoid using 'null' references.
+
+A Maybe<T> represents a possibly non-existent value of type T.  The Maybe
+type makes it impossible (without deliberate effort to circumvent the API)
+to use the value when it does not exist.
+
+A Maybe<T> is either Unknown<T>(), in which case a known value does not exist,
+or Definitely(v) (or, v.Definitely()) in which case the value is known to be v.
+
+A Maybe<T> is IEnumerable, which means you can use it with the foreach statement
+to extract a value and do something with it only if there is a value.
+
+   class Customer
+   {
+       public Maybe<string> EmailAddress { ... }
+       ...
+   }
+
+   foreach (string emailAddress in aCustomer.EmailAddress)
+   {
+       SendEmailTo(emailAddress);
+   }
+
+
+Maybe<T> being IEnumerable really comes into its own when combined with the Linq
+ API, which has useful extension methods for working with IEnumerables.
+You can then work in terms of entire collections of things that might or might
+not exist, without having to test for the existence of each one.
+
+For example, if I have a collection of 'maybe' email addresses, some
+of which might exist and some might not:
+
+    IEnumerable<Maybe<string>> maybeEmailAddresses = ...
+
+I can get a set of only the actual email addresses in a single expression:
+
+    var actualEmailAddresses = new HashSet(maybeEmailAddresses.SelectMany(it => it));
+
+More likely, I have an IEnumerable collection of Customers.  Using a
+Func, I can write a single expression to get the email addresses
+of all customers who have an email address:
+
+Here's a function to map a customer to its 'maybe' email address:
+
+   Func<Customer,Maybe<string>> toEmailAddress = c => c.EmailAddress;
+
+And here's how to use it to get all the email addresses that my
+customers have, so I can send them product announcements:
+
+   var emailAddresses = new HashSet(customers.SelectMany(toEmailAddress));
+
+Alternatively, without declaring the Func:
+
+   var emailAddresses = new HashSet(customers.SelectMany(c => c.EmailAddress));
+
+If I just want to send emails, I don't need the hash set:
+
+   foreach (string emailAddress in customers.SelectMany(c => c.EmailAddress))
+   {
+       SendEmailTo(emailAddress);
+   }
+
+That's not to say that Maybe doesn't have useful methods to work with
+individual instances.  For example, the Otherwise method:
+
+   T Otherwise(T defaultValue);
+
+will return the Maybe's value if it is known and the defaultValue if it is not.
+E.g.
+
+       Assert.That(Maybe.Unknown<string>().Otherwise(""), Is.EqualTo(""));
+       Assert.That("foo".Definitely().Otherwise(""), Is.EqualTo("foo"));
+
+Otherwise is overloaded to take a Maybe<T> as a default:
+
+   Maybe<T> Otherwise(Maybe<T> maybeDefaultValue);
+
+which lets you chain Otherwise expressions:
+
+   Assert.That(Maybe<string>.Unknown().Otherwise("X".Definitely()).Otherwise(""), Is.EqualTo("X"));
+
+Maybe also has a method that uses a method to map a Maybe<T> to a Maybe<U>
+(that also plays nicely with Linq)
+
+    Maybe<U> Select(Func<T,U> mapping);
+
+which would transform Unknown<T>() to Unknown<U>(), otherwise apply the function to
+the definite value and return the result wrapped in a Maybe.
+
+Similarly there is a Where method that takes a Predicate<T> and maps a Maybe<T>
+to a Maybe<bool> (again, plays nicely with Linq).
+
+All of which API calls make it impossible (without deliberate effort) to try to
+get the value of nothing.

@@ -21,9 +21,9 @@ namespace Maybe
                 _emailAddress = Maybe.Unknown<string>();
             }
 
-            public Maybe<String> EmailAddress()
+            public Maybe<string> EmailAddress
             {
-                return _emailAddress;
+                get { return _emailAddress; }
             }
         }
 
@@ -72,9 +72,9 @@ namespace Maybe
         public void Transforming()
         {
             Assert.That(
-                new Customer("alice@example.com").EmailAddress().Select(it => it.ToUpper()).Otherwise("nobody@example.com"),
+                new Customer("alice@example.com").EmailAddress.Select(it => it.ToUpper()).Otherwise("nobody@example.com"),
                 Is.EqualTo("ALICE@EXAMPLE.COM"));
-            Assert.That(new Customer().EmailAddress().Select(it => it.ToUpper()).Otherwise("UNKNOWN"),
+            Assert.That(new Customer().EmailAddress.Select(it => it.ToUpper()).Otherwise("UNKNOWN"),
                         Is.EqualTo("UNKNOWN"));
         }
 
@@ -96,7 +96,7 @@ namespace Maybe
             Maybe<string> foo = "foo".Definitely();
 
             if (foo.IsKnown())
-                foreach (String s in foo)
+                foreach (string s in foo)
                 {
                     Assert.That(s, Is.EqualTo("foo"));
                 }
@@ -122,22 +122,22 @@ namespace Maybe
         public void ExampleCollectingValidEmailAddresses()
         {
             var customers = new List<Customer>
-                            {
-                                new Customer(),
-                                new Customer("alice@example.com"),
-                                new Customer("bob@example.com"),
-                                new Customer(),
-                                new Customer("alice@example.com")
-                            };
+                                {
+                                    new Customer(),
+                                    new Customer("alice@example.com"),
+                                    new Customer("bob@example.com"),
+                                    new Customer(),
+                                    new Customer("alice@example.com")
+                                };
 
-            var emailAddresses = new HashSet<string>(customers.SelectMany(c => c.EmailAddress()));
+            var emailAddresses = new HashSet<string>(customers.SelectMany(c => c.EmailAddress));
 
             Assert.That(emailAddresses, Is.EqualTo(new HashSet<string>
-                                                   {
-                                                       "alice@example.com",
-                                                       "bob@example.com",
-                                                       "alice@example.com"
-                                                   }));
+                                                       {
+                                                           "alice@example.com",
+                                                           "bob@example.com",
+                                                           "alice@example.com"
+                                                       }));
         }
 
         private static Maybe<String> NoString()
