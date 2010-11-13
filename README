@@ -1,3 +1,7 @@
+Note: The source and the documentation below are both almost a transliteration
+of Nat Pryce's maybe-java <https://github.com/npryce/maybe-java>
+with some adaptations for C# generics and LINQ.
+
 The aim of the Maybe type is to avoid using 'null' references.
 
 A Maybe<T> represents a possibly non-existent value of type T.  The Maybe
