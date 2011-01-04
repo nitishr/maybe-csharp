@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Maybe
 {
@@ -133,6 +134,11 @@ namespace Maybe
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public void IfKnown(Action<T> action)
+        {
+            this.ToList().ForEach(action);
         }
     }
 }

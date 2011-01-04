@@ -140,6 +140,20 @@ namespace Maybe
                                                        }));
         }
 
+        [Test]
+        public void IfKnownOfKnownValue()
+        {
+            int value = 0;
+            1.Definitely().IfKnown(it => value = it);
+            Assert.That(value, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void IfKnownOfUnknownValue()
+        {
+            NoString().IfKnown(it => Assert.Fail("Action was executed for an unknown object"));
+        }
+
         private static Maybe<String> NoString()
         {
             return Maybe.Unknown<string>();
