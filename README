@@ -27,7 +27,7 @@ to extract a value and do something with it only if there is a value.
 
 
 Maybe<T> being IEnumerable really comes into its own when combined with the Linq
- API, which has useful extension methods for working with IEnumerables.
+API, which has useful extension methods for working with IEnumerables.
 You can then work in terms of entire collections of things that might or might
 not exist, without having to test for the existence of each one.
 
